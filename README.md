@@ -21,6 +21,10 @@ for windows its
 ```powershell
 .\.venv\Scripts\activate.ps1
 ```
+btw windows might not let you run this,execution policy and all that use this command for this
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
 
 then to install dependencies it should be the same for linux and windows i think i may be wrong
 ```bash
