@@ -38,23 +38,3 @@ jobs:
       with:
         name: fake-nitro-${{ matrix.os }}-py3.10
         path: dist/
-
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    steps:
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: dist
-
-      - name: Create Release
-        id: create_release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: dist/**/*
-          tag_name: ${{ github.run_number }}
-          body: "Release for workflow run ${{ github.run_number }}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
