@@ -21,14 +21,10 @@ jobs:
           - os: ubuntu-latest
             architecture: arm64
             plat: manylinux_aarch64
-            runner: [self-hosted, linux, arm64]
+            runner: ubuntu-latest
           - os: windows-latest
             architecture: x64
             plat: win_amd64
-            runner: windows-latest
-          - os: windows-latest
-            architecture: arm64
-            plat: win_arm64
             runner: windows-latest
           - os: macos-latest
             architecture: x64
@@ -42,6 +38,10 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
+
+    - name: Install gettext on macOS
+      if: runner.os == 'macOS'
+      run: brew install gettext
 
     - name: Set up Python 3.10
       uses: actions/setup-python@v5
