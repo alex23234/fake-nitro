@@ -14,16 +14,23 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ["3.9", "3.10", "3.11"]
+        include:
+          - os: ubuntu-latest
+            architecture: x64
+            plat: manylinux_x86_64
+          - os: ubuntu-latest
+            architecture: arm64
+            plat: manylinux_aarch64
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python 3.10
       uses: actions/setup-python@v5
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: "3.10"
+        architecture: ${{ matrix.architecture }}
 
     - name: Install dependencies
       run: |
@@ -37,5 +44,25 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: fake-nitro-${{ matrix.os }}-py${{ matrix.python-version }}
+        name: fake-nitro-${{ matrix.os }}-${{ matrix.architecture }}-py3.10
         path: dist/
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/**/*
+          tag_name: ${{ github.run_number }}
+          body: "Release for workflow run ${{ github.run_number }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
